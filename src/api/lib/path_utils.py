@@ -2,8 +2,8 @@ from pathlib import Path
 
 def get_project_root() -> Path:
     """
-    Remonte l'arborescence pour trouver la racine du projet,
-    marquée par la présence du fichier `pyproject.toml`.
+    Traverses up the directory tree to find the project root,
+    marked by the presence of the `pyproject.toml` file.
     """
     current_path = Path.cwd()
     while not (current_path / "pyproject.toml").exists():

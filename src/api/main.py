@@ -7,22 +7,22 @@ import os
 from src.api.lib.process_text import process_text
 from src.api.lib.path_utils import get_project_root
 
-# Initialisation de l'application FastAPI
+# Initialize FastAPI app
 app = FastAPI(
     title="StackOverflow Tags Suggester API",
     description="API to suggest tags for StackOverflow questions.",
     version="0.1.0"
 )
 
-# Modèle de données pour les requêtes de prédiction
+# Pydantic model for prediction requests
 class Question(BaseModel):
     body: str
 
-# Modèle de données pour les réponses de prédiction
+# Pydantic model for prediction responses
 class Tags(BaseModel):
     tags: list[str]
 
-# --- Stockage des modèles et artefacts chargés ---
+# --- Storage for loaded models and artifacts ---
 model = None
 vectorizer = None
 mlb = None
@@ -30,7 +30,7 @@ mlb = None
 @app.on_event("startup")
 def startup_event():
     """
-    Charge les modèles et les artefacts au démarrage de l'application.
+    Load models and artifacts when the application starts.
     """
     global model, vectorizer, mlb
 
@@ -59,11 +59,11 @@ def startup_event():
         print(f"❌ An error occurred while loading the model or artifacts:")
         print(e)
 
-# Endpoint de prédiction
+# Prediction endpoint
 @app.post("/predict", response_model=Tags)
 def predict(question: Question):
     """
-    Prédit les tags pour une question donnée.
+    Predicts tags for a given question.
     """
     if not all([model, vectorizer, mlb]):
         raise HTTPException(status_code=503, detail="Model or artifacts not loaded yet")
@@ -76,7 +76,7 @@ def predict(question: Question):
 
     return {"tags": list(predicted_tags[0])}
 
-# Endpoint racine
+# Root endpoint
 @app.get("/")
 def read_root():
     return {"message": "Welcome to the StackOverflow Tags Suggester API!"}

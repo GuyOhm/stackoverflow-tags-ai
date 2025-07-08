@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 
-# Configuration de la page
+# Page Configuration
 st.set_page_config(
     page_title="StackOverflow Tag Suggester",
     page_icon="🏷️",
@@ -10,10 +10,10 @@ st.set_page_config(
 st.title("🏷️ StackOverflow Tag Suggester")
 st.caption("A simple UI to test the tag suggestion API.")
 
-# URL de l'API (à adapter si l'API n'est pas locale)
+# API URL (adjust if the API is not running locally)
 API_URL = "http://127.0.0.1:8000/predict"
 
-# Zone de texte pour la question
+# Text area for the question
 with st.form("question_form"):
     question_body = st.text_area(
         "Enter your question body",
@@ -26,7 +26,7 @@ if submitted and question_body:
     with st.spinner("Calling the API..."):
         try:
             response = requests.post(API_URL, json={"body": question_body})
-            response.raise_for_status()  # Lève une exception pour les codes d'erreur HTTP (4xx ou 5xx)
+            response.raise_for_status()  # Raises an exception for HTTP error codes (4xx or 5xx)
             
             tags_data = response.json()
             tags = tags_data.get("tags", [])
@@ -35,7 +35,7 @@ if submitted and question_body:
             
             if tags:
                 st.write("Suggested Tags:")
-                # Afficher les tags comme des badges
+                # Display tags as badges
                 tags_html = "".join(f"<span style='background-color: #007BFF; color: white; border-radius: 5px; padding: 5px 10px; margin: 2px;'>{tag}</span>" for tag in tags)
                 st.markdown(tags_html, unsafe_allow_html=True)
             else:
