@@ -6,3 +6,6 @@ src/api/lib/__pycache__/
 
 # ML Models & Artifacts
 models/
+
+# Egg-info metadata (setuptools/pip)
+src/*.egg-info/

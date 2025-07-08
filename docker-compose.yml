@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: api
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount the local models directory into the container.
+      # The API will load the models from /app/models.
+      # Note: You need to have the models present in the `models` directory locally.
+      - ./models:/app/models
+    # Healthcheck to ensure the API is ready before Streamlit starts
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  streamlit:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: streamlit
+    ports:
+      - "8501:8501"
+    environment:
+      # The Streamlit app will connect to the API via its service name in the Docker network.
+      - API_URL=http://api:8000/predict
+    depends_on:
+      api:
+        condition: service_healthy 
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5

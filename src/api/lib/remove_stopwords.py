@@ -2,9 +2,6 @@ import nltk
 from nltk.corpus import stopwords
 import string
 
-nltk.download('stopwords')
-nltk.download('punkt')
-
 
 def remove_stopwords_and_punctuation(tokens):
     """

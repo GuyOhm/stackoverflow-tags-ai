@@ -1,5 +1,6 @@
 import streamlit as st
 import requests
+import os
 
 # Page Configuration
 st.set_page_config(
@@ -10,8 +11,8 @@ st.set_page_config(
 st.title("🏷️ StackOverflow Tag Suggester")
 st.caption("A simple UI to test the tag suggestion API.")
 
-# API URL (adjust if the API is not running locally)
-API_URL = "http://127.0.0.1:8000/predict"
+# API URL is now configurable via environment variable
+API_URL = os.getenv("API_URL", "http://127.0.0.1:8000/predict")
 
 # Text area for the question
 with st.form("question_form"):

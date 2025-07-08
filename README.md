@@ -54,3 +54,22 @@ In a new terminal, from the `stackoverflow-tags-ai` directory, run:
 streamlit run src/streamlit/app.py
 ```
 The user interface will open in your browser, typically at `http://localhost:8501`.
+
+## 3. Running with Docker Compose
+
+Alternatively, you can run both applications using Docker Compose. This is the recommended way for a production-like environment.
+
+1.  **Make sure you have Docker and Docker Compose installed.**
+
+2.  **Build and run the services:**
+    From the `stackoverflow-tags-ai` directory, run:
+    ```bash
+    docker-compose up --build
+    ```
+    - The API will be available at `http://localhost:8000`.
+    - The Streamlit UI will be available at `http://localhost:8501`.
+
+3.  **To stop the services**, press `Ctrl+C` in the terminal where `docker-compose` is running, and then run:
+    ```bash
+    docker-compose down
+    ```

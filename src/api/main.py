@@ -6,6 +6,7 @@ import os
 
 from src.api.lib.process_text import process_text
 from src.api.lib.path_utils import get_project_root
+from src.api.lib.nltk_utils import download_nltk_data
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -33,6 +34,10 @@ def startup_event():
     Load models and artifacts when the application starts.
     """
     global model, vectorizer, mlb
+
+    print("Downloading NLTK data...")
+    download_nltk_data()
+    print("NLTK data downloaded successfully!")
 
     project_root = get_project_root()
     

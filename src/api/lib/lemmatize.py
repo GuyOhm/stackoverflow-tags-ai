@@ -3,10 +3,6 @@ from nltk.stem import WordNetLemmatizer
 from nltk.corpus import wordnet
 from nltk import pos_tag, word_tokenize
 
-nltk.download('wordnet')
-nltk.download('averaged_perceptron_tagger_eng')
-nltk.download('punkt')
-
 lemmatizer = WordNetLemmatizer()
 
 # Function to map NLTK's POS (Part-of-Speech) tags to WordNet's tags
