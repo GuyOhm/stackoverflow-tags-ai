@@ -7,37 +7,13 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build-test:
-    name: Build, download models, test, and push images
+  test:
+    name: Run unit tests
     runs-on: ubuntu-latest
-
-    env:
-      # These variables should be configured in GitHub secrets
-      ACR_LOGIN_SERVER: ${{ secrets.REGISTRY_LOGIN_SERVER }}
-      ACR_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
-      ACR_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
-      AZURE_STORAGE_ACCOUNT: ${{ secrets.AZURE_STORAGE_ACCOUNT }}
-      AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_KEY }}
-      AZURE_STORAGE_SHARE: ${{ secrets.AZURE_STORAGE_SHARE }}
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Azure CLI login
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Download models from Azure Files share
-        run: |
-          az storage blob download-batch \
-            --account-name "$AZURE_STORAGE_ACCOUNT" \
-            --account-key "$AZURE_STORAGE_KEY" \
-            --destination "./models" \
-            --source "$AZURE_STORAGE_SHARE"
-
-      # ---- Run unit tests before building images ----
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -47,9 +23,42 @@ jobs:
         run: |
           pip install -e .[tests] pytest
 
+      - name: Download NLTK data
+        run: python -m nltk.downloader punkt punkt_tab stopwords wordnet averaged_perceptron_tagger averaged_perceptron_tagger_eng
+
       - name: Run tests
         run: |
-          pytest
+          python -m pytest
+
+  build-and-push:
+    name: Build, download models, and push images
+    if: github.ref == 'refs/heads/main'
+    needs: test
+    runs-on: ubuntu-latest
+    environment: env-prod
+    env:
+      ACR_LOGIN_SERVER: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+      ACR_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+      ACR_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+      AZURE_STORAGE_ACCOUNT: ${{ secrets.AZURE_STORAGE_ACCOUNT }}
+      AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_KEY }}
+      AZURE_STORAGE_SHARE: ${{ secrets.AZURE_STORAGE_SHARE }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Azure CLI login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Download models from Azure Blob Storage
+        run: |
+          az storage blob download-batch \
+            --account-name "$AZURE_STORAGE_ACCOUNT" \
+            --account-key "$AZURE_STORAGE_KEY" \
+            --destination "./models" \
+            --source "$AZURE_STORAGE_SHARE"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -81,20 +90,18 @@ jobs:
           tags: |
             ${{ env.ACR_LOGIN_SERVER }}/stackoverflow-ui:${{ github.sha }}
 
-
   deploy:
     name: Deploy to Azure Container Apps
     if: github.ref == 'refs/heads/main'
-    needs: build-test
+    needs: build-and-push
     runs-on: ubuntu-latest
-
+    environment: env-prod
     env:
       ACR_LOGIN_SERVER: ${{ secrets.REGISTRY_LOGIN_SERVER }}
       RG: ${{ secrets.AZURE_RG }}
       ENV_CA: ${{ secrets.AZURE_CA_ENV }}
       API_APP_NAME: ${{ secrets.AZURE_API_APP }}
       UI_APP_NAME: ${{ secrets.AZURE_UI_APP }}
-
     steps:
       - name: Azure CLI login
         uses: azure/login@v1
