@@ -21,9 +21,8 @@ RUN uv pip install -e . --system
 #
 FROM base as api
 
-# The API needs the models, which will be mounted as a volume.
-# We create the directory so that permissions are correct if a volume is mounted.
-RUN mkdir -p /app/models
+# Copy the downloaded models from the build context into the final image
+COPY models/ ./models/
 
 EXPOSE 8000
 CMD ["uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "8000"]
