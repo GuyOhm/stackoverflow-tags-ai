@@ -47,16 +47,19 @@ def startup_event():
 
     try:
         print(f"Loading model from {MODEL_PATH}...")
-        model = mlflow.sklearn.load_model(MODEL_PATH)    
+        # Convert Path to string for compatibility
+        model = mlflow.sklearn.load_model(str(MODEL_PATH))
         print("Model loaded successfully!")
 
         print(f"Loading vectorizer from {VECTORIZER_PATH}...")
-        with open(VECTORIZER_PATH, "rb") as f:
+        # Convert Path to string for compatibility
+        with open(str(VECTORIZER_PATH), "rb") as f:
             vectorizer = pickle.load(f)
         print("Vectorizer loaded successfully!")
 
         print(f"Loading binarizer from {MLB_PATH}...")
-        with open(MLB_PATH, "rb") as f:
+        # Convert Path to string for compatibility
+        with open(str(MLB_PATH), "rb") as f:
             mlb = pickle.load(f)
         print("Binarizer loaded successfully!")
 
