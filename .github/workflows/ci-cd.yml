@@ -62,6 +62,7 @@ jobs:
             --account-key "$AZURE_STORAGE_KEY" \
             --destination "./models" \
             --source "$AZURE_STORAGE_SHARE"
+          ls -la ./models
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
