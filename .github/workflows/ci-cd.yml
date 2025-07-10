@@ -129,4 +129,4 @@ jobs:
           az containerapp update \
             -g $RG -n $UI_APP_NAME \
             --image ${{ steps.vars.outputs.UI_IMAGE }} \
-            --set-env-vars API_URL=http://${{ env.API_APP_NAME }}:8000/predict
+            --set-env-vars API_URL=http://${{ env.API_APP_NAME }}/predict
