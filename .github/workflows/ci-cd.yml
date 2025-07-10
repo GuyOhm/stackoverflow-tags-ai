@@ -23,6 +23,9 @@ jobs:
         run: |
           pip install -e .[tests] pytest
 
+      - name: Download NLTK data
+        run: python -m nltk.downloader punkt stopwords wordnet averaged_perceptron_tagger
+
       - name: Run tests
         run: |
           python -m pytest
